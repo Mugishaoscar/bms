@@ -1,8 +1,10 @@
 package com.bar.bms.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
-@Entity // Tells MySQL to create a table named 'debt'
+@Entity
+@Table(name = "debts")
 public class Debt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,15 +15,20 @@ public class Debt {
     private String phone;
     private Double amount;
 
-    // Standard Getters and Setters (Important if you aren't using Lombok)
+    @Column(name = "date_recorded")
+    private LocalDateTime dateRecorded;
+
+    // Getters
     public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
     public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
     public String getItems() { return items; }
-    public void setItems(String items) { this.items = items; }
     public String getPhone() { return phone; }
-    public void setPhone(String phone) { this.phone = phone; }
     public Double getAmount() { return amount; }
+    public LocalDateTime getDateRecorded() { return dateRecorded; }
+
+    // Setters
+    public void setName(String name) { this.name = name; }
+    public void setItems(String items) { this.items = items; }
+    public void setPhone(String phone) { this.phone = phone; }
     public void setAmount(Double amount) { this.amount = amount; }
 }

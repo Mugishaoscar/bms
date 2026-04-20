@@ -8,14 +8,9 @@ import java.util.List;
 
 @Service
 public class DebtService {
-    @Autowired
-    private DebtRepository debtRepository;
-
-    public List<Debt> getAllDebts() {
-        return debtRepository.findAll();
-    }
-
-    public void saveDebt(Debt debt) {
-        debtRepository.save(debt);
+    @Autowired private DebtRepository repository;
+    public List<Debt> getAllDebts() { return repository.findAll(); }
+    public double calculateTotalDebt(List<Debt> debts) {
+        return debts.stream().mapToDouble(Debt::getAmount).sum();
     }
 }
