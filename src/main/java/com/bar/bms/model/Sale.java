@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
-public class Debt {
+public class Sale {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,13 +16,9 @@ public class Debt {
     private String customerPhone;
     private String customerEmail;
 
-    private String items;
-
     private Double totalAmount;
     private LocalDateTime dateTime;
 
     private Long workerId;
     private Long bossId;
-
-    private String status; // UNPAID or PAID
 }

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Worker Report</title>
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; background: #f5fff8; }
+
+        .navbar {
+            height: 55px;
+            background: #00a859;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            color: white;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin: 0 18px;
+        }
+
+        .logout {
+            background: #007a3d;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .content {
+            padding: 35px;
+        }
+
+        h2 {
+            color: #008f4c;
+        }
+
+        .summary-card {
+            width: 260px;
+            background: white;
+            border-left: 8px solid #00a859;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .summary-card h3 {
+            margin: 0;
+            color: #555;
+        }
+
+        .summary-card p {
+            font-size: 28px;
+            font-weight: bold;
+            color: #00a859;
+            margin-bottom: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        th {
+            background: #00a859;
+            color: white;
+            padding: 12px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+        .end-day-btn {
+            background: #00a859;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 25px;
+        }
+
+        .end-day-btn:hover {
+            background: #008f4c;
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <strong>Worker</strong>
+
+    <div class="nav-links">
+        <a th:href="@{/worker/dashboard}">Product</a>
+        <a th:href="@{/worker/sales}">Sales</a>
+        <a th:href="@{/worker/report}">Report</a>
+        <a th:href="@{/worker/debt}">Debt</a>
+    </div>
+
+    <form th:action="@{/logout}" method="post">
+        <button class="logout" type="submit">Logout</button>
+    </form>
+</div>
+
+<div class="content">
+    <h2>Worker Report</h2>
+
+    <div class="summary-card">
+        <h3>Total Sales</h3>
+        <p><span th:text="${totalSales}">0</span> RWF</p>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Sale ID</th>
+            <th>Customer</th>
+            <th>Total Amount</th>
+            <th>Date</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="sale : ${sales}">
+            <td th:text="${sale.id}"></td>
+            <td th:text="${sale.customerName}"></td>
+            <td th:text="${sale.totalAmount}"></td>
+            <td th:text="${sale.dateTime}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<form th:action="@{/worker/end-day}" method="post">
+    <button type="submit" class="end-day-btn">End the Day</button>
+</form>
+</body>
+</html>

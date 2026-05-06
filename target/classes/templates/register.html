@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Register Boss</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            background: #d9f5e3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+
+        .card {
+            width: 360px;
+            background: white;
+            border-radius: 18px;
+            padding: 35px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+        }
+
+        .logo {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #008f4c;
+            margin-bottom: 25px;
+        }
+
+        input {
+            width: 100%;
+            height: 55px;
+            margin-bottom: 18px;
+            border: 1.5px solid #00a859;
+            border-radius: 14px;
+            padding: 0 18px;
+            font-size: 17px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        button {
+            background: #00b050;
+            color: white;
+            border: none;
+            padding: 13px 30px;
+            border-radius: 13px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #008f4c;
+        }
+
+        .links {
+            margin-top: 20px;
+        }
+
+        .links a {
+            text-decoration: none;
+            color: #1b1b1b;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <img src="/images/logo.png" class="logo" alt="Logo">
+
+    <h2>Create Boss Account</h2>
+
+    <form th:action="@{/admin/register-boss}" method="post" th:object="${boss}">
+
+        <input type="text" th:field="*{username}" placeholder="Choose Username" required>
+
+        <input type="password" id="password" th:field="*{password}" placeholder="Choose Password" required>
+
+        <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+
+        <button type="submit">Create Account</button>
+    </form>
+
+    <div class="links">
+        <a th:href="@{/login}">Already have account? Login</a>
+    </div>
+    <script>
+        document.querySelector("form").addEventListener("submit", function(e) {
+            let password = document.getElementById("password").value;
+            let confirmPassword = document.getElementById("confirmPassword").value;
+
+            if (password !== confirmPassword) {
+                alert("Passwords do not match!");
+                e.preventDefault();
+            }
+        });
+    </script>
+</div>
+
+</body>
+</html>

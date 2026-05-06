@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            background: #d9f5e3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+
+        .card {
+            width: 360px;
+            background: white;
+            border-radius: 18px;
+            padding: 35px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+        }
+
+        .logo {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            margin-bottom: 25px;
+        }
+
+        h2 {
+            color: #008f4c;
+            margin-bottom: 30px;
+        }
+
+        input {
+            width: 100%;
+            height: 55px;
+            margin-bottom: 18px;
+            border: 1.5px solid #00a859;
+            border-radius: 14px;
+            padding: 0 18px;
+            font-size: 18px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #007a3d;
+        }
+
+        button {
+            background: #00b050;
+            color: white;
+            border: none;
+            padding: 13px 38px;
+            border-radius: 13px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #008f4c;
+        }
+
+        .links {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+        }
+
+        .links a {
+            text-decoration: none;
+            color: #1b1b1b;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <img src="C:\Users\user\OneDrive\Desktop\New_folder\bar.jpg" class="logo" alt="Logo">
+
+    <h2>Login To Your Account</h2>
+
+    <form th:action="@{/login}" method="post">
+        <input type="text" name="username" placeholder="Username or Email" required>
+        <input type="password" name="password" placeholder="Password" required>
+
+        <button type="submit">Login</button>
+    </form>
+
+    <div class="links">
+        <a th:href="@{/forgot-password}">Forgot password?</a>
+        <a th:href="@{/register}">signup</a>
+    </div>
+</div>
+
+</body>
+</html>

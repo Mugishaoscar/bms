@@ -22,4 +22,15 @@ public class ProductService {
     public void saveProduct(Product product) {
         productRepository.save(product);
     }
+    public void sellOneProduct(Long productId) {
+        Product product = productRepository.findById(productId).orElse(null);
+
+        if (product != null && product.getStockQuantity() > 0) {
+            product.setStockQuantity(product.getStockQuantity() - 1);
+            productRepository.save(product);
+        }
+    }
+    public List<Product> getProductsByBoss(Long bossId) {
+        return productRepository.findByBossId(bossId);
+    }
 }

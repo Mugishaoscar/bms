@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin Reports</title>
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; background: #f5fff8; }
+        .navbar {
+            height: 55px; background: #00a859; display: flex;
+            align-items: center; justify-content: space-between;
+            padding: 0 30px; color: white;
+        }
+        .nav-links a { color: white; text-decoration: none; margin: 0 18px; }
+        .content { padding: 35px; }
+        h2 { color: #008f4c; }
+        table {
+            width: 100%; border-collapse: collapse; background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        th { background: #00a859; color: white; padding: 12px; }
+        td { padding: 12px; border-bottom: 1px solid #ddd; text-align: center; }
+        .badge {
+            background: #d9f5e3; color: #008f4c;
+            padding: 6px 12px; border-radius: 10px; font-weight: bold;
+        }
+        .logout {
+            background: #007a3d; color: white; border: none;
+            padding: 8px 18px; border-radius: 10px; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <strong>Admin</strong>
+
+    <div class="nav-links">
+        <a th:href="@{/admin/dashboard}">Dashboard</a>
+        <a th:href="@{/admin/product}">Product</a>
+        <a th:href="@{/admin/employee}">Employee</a>
+        <a th:href="@{/admin/report}">Report</a>
+        <a th:href="@{/admin/debt}">Debt</a>
+    </div>
+
+    <form th:action="@{/logout}" method="post">
+        <button class="logout" type="submit">Logout</button>
+    </form>
+</div>
+
+<div class="content">
+    <h2>Submitted Day Reports</h2>
+
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Worker ID</th>
+            <th>Boss ID</th>
+            <th>Date</th>
+            <th>Total Sales</th>
+            <th>Submitted At</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="report : ${dayReports}">
+            <td th:text="${report.id}"></td>
+            <td th:text="${report.workerId}"></td>
+            <td th:text="${report.bossId}"></td>
+            <td th:text="${report.reportDate}"></td>
+            <td><span th:text="${report.totalSales}"></span> RWF</td>
+            <td th:text="${report.submittedAt}"></td>
+            <td><span class="badge" th:text="${report.status}"></span></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

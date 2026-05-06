@@ -3,13 +3,20 @@ package com.bar.bms.controller;
 import com.bar.bms.model.Employee;
 import com.bar.bms.model.Product;
 import com.bar.bms.model.Debt;
+import com.bar.bms.model.User;
+import com.bar.bms.repository.DayReportRepository;
 import com.bar.bms.repository.EmployeeRepository;
 import com.bar.bms.service.ProductService;
 import com.bar.bms.service.DebtService;
+//import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import com.bar.bms.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
 
@@ -29,14 +36,28 @@ public class AdminController {
     // Handles the URL: http://localhost:8080/admin/dashboard
     @GetMapping("/dashboard")
     public String showDashboard(Model model) {
-        model.addAttribute("products", productService.getAllProducts());
+        User boss = getLoggedInUser();
+
+        if (boss != null) {
+            model.addAttribute("products", productService.getProductsByBoss(boss.getId()));
+        } else {
+            model.addAttribute("products", productService.getAllProducts());
+        }
         return "admin_dashboard";
     }
 
     // Handles saving products (Create and Update)
     @PostMapping("/saveProduct")
     public String saveProduct(@ModelAttribute Product product) {
+
+
+        User boss = getLoggedInUser();
+
+        if (boss != null) {
+            product.setBossId(boss.getId());
+        }
         productService.saveProduct(product);
+
         return "redirect:/admin/dashboard";
     }
 
@@ -63,10 +84,48 @@ public class AdminController {
         employeeRepo.save(employee);
         return "redirect:/admin/employee";
     }
+    // Inside AdminController.java
+
+    @Autowired
+    private UserRepository userRepository; // This connects the controller to the users table
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @PostMapping("/register-boss")
+    public String registerBoss(@ModelAttribute User boss) {
+        boss.setRole("BOSS");
+        boss.setPassword(passwordEncoder.encode(boss.getPassword()));
+        userRepository.save(boss);
+        return "redirect:/login";
+    }
 
     @GetMapping("/employee/delete/{id}")
     public String deleteEmployee(@PathVariable Long id) {
         employeeRepo.deleteById(id);
         return "redirect:/admin/employee";
+    }
+//    @PostMapping("/register-boss")
+//    public String registerBoss(@ModelAttribute User boss) {
+//        boss.setRole("BOSS");
+//        userRepository.save(boss);
+//        return "redirect:/login";
+//    }
+     @Autowired
+     private DayReportRepository dayReportRepository;
+    @GetMapping("/report")
+    public String showReportPage(Model model) {
+        model.addAttribute("dayReports", dayReportRepository.findAllByOrderBySubmittedAtDesc());
+        return "report_page";
+    }
+
+
+    private User getLoggedInUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated() || auth.getName().equals("anonymousUser")) {
+            return null;
+        }
+
+        String username = auth.getName();
+        return userRepository.findByUsername(username).orElse(null);
     }
 }

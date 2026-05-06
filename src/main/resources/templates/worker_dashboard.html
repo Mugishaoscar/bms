@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Worker Dashboard</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: white;
+        }
+
+        .navbar {
+            height: 55px;
+            background: #00a859;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            color: white;
+        }
+
+        .role {
+            background: white;
+            color: #00a859;
+            padding: 5px 25px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin: 0 20px;
+            font-size: 16px;
+        }
+
+        .logout {
+            background: #007a3d;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .content {
+            padding: 50px;
+        }
+
+        .product-grid {
+            display: flex;
+            gap: 35px;
+            flex-wrap: wrap;
+        }
+
+        .product-card {
+            width: 190px;
+            background: #d9d9d9;
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 170px;
+            object-fit: contain;
+            background: white;
+            border-radius: 5px;
+        }
+
+        .product-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-weight: bold;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .sold-btn {
+            background: #00b050;
+            color: white;
+            border: none;
+            padding: 7px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .debt-btn {
+            background: #ff3333;
+            color: white;
+            border: none;
+            padding: 7px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="role">Worker</div>
+
+    <div class="nav-links">
+        <a th:href="@{/worker/dashboard}">Product</a>
+        <a th:href="@{/worker/sales}">Sales</a>
+        <a th:href="@{/worker/report}">Report</a>
+        <a th:href="@{/worker/debt}">Debt</a>
+    </div>
+
+    <form th:action="@{/logout}" method="post">
+        <button class="logout" type="submit">Logout</button>
+    </form>
+</div>
+
+<div class="content">
+
+    <div class="product-grid">
+
+        <div class="product-card" th:each="product : ${products}">
+            <img th:src="@{'/images/' + ${product.imageUrl}}" alt="Product">
+
+            <div class="product-info">
+                <span th:text="${product.name}">Primus</span>
+                <span th:text="${product.stockQuantity}">12</span>
+            </div>
+
+            <div class="buttons">
+                <form th:action="@{/worker/sell}" method="post">
+                    <input type="hidden" name="productId" th:value="${product.id}">
+                    <button class="sold-btn" type="button" onclick="openSalePopup()">Sold</button>
+                </form>
+
+                <form th:action="@{/worker/debt/add}" method="get">
+                    <input type="hidden" name="productId" th:value="${product.id}">
+                    <button class="debt-btn" type="button" onclick="openDebtPopup()">Debt</button>
+                </form>
+            </div>
+            <div id="salePopup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); justify-content:center; align-items:center;">
+                <div style="background:white; padding:25px; border-radius:15px; width:420px;">
+                    <h2 style="color:#00a859;">Create Sale</h2>
+
+                    <form th:action="@{/worker/sale/create}" method="post">
+                        <input type="text" name="customerName" placeholder="Customer Name (optional)">
+                        <input type="text" name="customerPhone" placeholder="Phone (optional)">
+                        <input type="email" name="customerEmail" placeholder="Email (optional)">
+
+                        <hr>
+
+                        <div id="itemsBox">
+                            <div class="sale-item">
+                                <select name="productIds">
+                                    <option th:each="p : ${products}"
+                                            th:value="${p.id}"
+                                            th:text="${p.name}">
+                                    </option>
+                                </select>
+
+                                <input type="number" name="quantities" value="1" min="1">
+                            </div>
+                        </div>
+
+                        <button type="button" onclick="addItem()">+ Add Product</button>
+                        <br><br>
+
+                        <button class="sold-btn" type="submit">Save Sale</button>
+                        <button type="button" onclick="closeSalePopup()">Cancel</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div id="salePopup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); justify-content:center; align-items:center;">
+    <div style="background:white; padding:25px; border-radius:15px; width:420px;">
+        <h2 style="color:#00a859;">Create Sale</h2>
+
+        <form th:action="@{/worker/sale/create}" method="post">
+            <input type="text" name="customerName" placeholder="Customer Name (optional)">
+            <input type="text" name="customerPhone" placeholder="Phone (optional)">
+            <input type="email" name="customerEmail" placeholder="Email (optional)">
+
+            <hr>
+
+            <div id="itemsBox">
+                <div class="sale-item">
+                    <select name="productIds">
+                        <option th:each="p : ${products}"
+                                th:value="${p.id}"
+                                th:text="${p.name}">
+                        </option>
+                    </select>
+
+                    <input type="number" name="quantities" value="1" min="1">
+                </div>
+            </div>
+
+            <button type="button" onclick="addItem()">+ Add Product</button>
+            <br><br>
+
+            <button class="sold-btn" type="submit">Save Sale</button>
+            <button type="button" onclick="closeSalePopup()">Cancel</button>
+        </form>
+    </div>
+</div>
+<div id="debtPopup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); justify-content:center; align-items:center;">
+    <div style="background:white; padding:25px; border-radius:15px; width:420px;">
+        <h2 style="color:#00a859;">Record Debt</h2>
+
+        <form th:action="@{/worker/debt/create}" method="post">
+            <input type="text" name="customerName" placeholder="Customer Name" required>
+            <input type="text" name="customerPhone" placeholder="Phone Number">
+            <input type="email" name="customerEmail" placeholder="Email">
+
+            <input type="text" name="items" placeholder="Items e.g Primus x2, Skol x1" required>
+            <input type="number" name="totalAmount" placeholder="Total Amount" required>
+
+            <button class="debt-btn" type="submit">Save Debt</button>
+            <button type="button" onclick="closeDebtPopup()">Cancel</button>
+        </form>
+    </div>
+</div>
+<script>
+    function openSalePopup() {
+        document.getElementById("salePopup").style.display = "flex";
+    }
+
+    function closeSalePopup() {
+        document.getElementById("salePopup").style.display = "none";
+    }
+
+    function addItem() {
+        const itemsBox = document.getElementById("itemsBox");
+        const firstItem = document.querySelector(".sale-item");
+        const newItem = firstItem.cloneNode(true);
+
+        newItem.querySelector("input").value = 1;
+        itemsBox.appendChild(newItem);
+    }
+    function openDebtPopup() {
+        document.getElementById("debtPopup").style.display = "flex";
+    }
+
+    function closeDebtPopup() {
+        document.getElementById("debtPopup").style.display = "none";
+    }
+</script>
+
+</body>
+</html>

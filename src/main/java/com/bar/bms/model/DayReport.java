@@ -2,27 +2,24 @@ package com.bar.bms.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
 @Data
-public class Debt {
+public class DayReport {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String customerName;
-    private String customerPhone;
-    private String customerEmail;
-
-    private String items;
-
-    private Double totalAmount;
-    private LocalDateTime dateTime;
-
     private Long workerId;
     private Long bossId;
 
-    private String status; // UNPAID or PAID
+    private LocalDate reportDate;
+    private Double totalSales;
+    private LocalDateTime submittedAt;
+
+    private String status; // SUBMITTED, REVIEWED
 }
