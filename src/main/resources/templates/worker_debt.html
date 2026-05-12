@@ -2,88 +2,271 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Worker Debt</title>
+
     <style>
-        body { margin: 0; font-family: Arial, sans-serif; background: #f5fff8; }
-        .navbar {
-            height: 55px; background: #00a859; display: flex;
+        :root {
+            --green: #00a859;
+            --dark-green: #007a3d;
+            --light-bg: #f4f6f5;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--light-bg);
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 255px;
+            height: 100vh;
+            background: linear-gradient(180deg,#006b38,#003f24);
+            color: white;
+            padding: 25px 18px;
+            box-sizing: border-box;
+        }
+
+        .brand {
+            display: flex;
             align-items: center;
-            justify-content: space-between; padding: 0 30px; color: white;
+            gap: 12px;
+            margin-bottom: 40px;
         }
-        .nav-links a { color: white; text-decoration: none; margin: 0 18px; }
-        .logout {
-            background: #007a3d; color: white; border: none;
-            padding: 8px 18px; border-radius: 10px; cursor: pointer;
+
+        .logo-circle {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: var(--green);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            font-weight: bold;
         }
-        .content { padding: 35px; }
-        h2 { color: #008f4c; }
-        table {
-            width: 100%; border-collapse: collapse; background: white;
+
+        .brand h2 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .brand p {
+            margin: 0;
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+        .side-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .side-links a {
+            color: white;
+            text-decoration: none;
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .side-links a:hover,
+        .side-links .active {
+            background: rgba(255,255,255,0.18);
+        }
+
+        .logout-form {
+            position: absolute;
+            bottom: 25px;
+            left: 18px;
+            right: 18px;
+        }
+
+        .logout-form button {
+            width: 100%;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 13px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .main-content {
+            margin-left: 255px;
+        }
+
+        .topbar {
+            height: 75px;
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 35px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .topbar h1 {
+            margin: 0;
+            color: var(--dark-green);
+        }
+
+        .role-pill {
+            background: #e6fff0;
+            color: var(--dark-green);
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .container {
+            padding: 35px;
+        }
+
+        .table-card {
+            background: white;
+            border-radius: 18px;
+            overflow: hidden;
             box-shadow: 0 5px 15px rgba(0,0,0,0.08);
         }
-        th { background: #00a859; color: white; padding: 12px; }
-        td { padding: 12px; border-bottom: 1px solid #ddd; text-align: center; }
-        .badge {
-            padding: 6px 12px; border-radius: 10px; font-weight: bold;
-            background: #ffe0e0; color: #cc0000;
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f3f4f6;
+            padding: 16px;
+            text-align: left;
+        }
+
+        td {
+            padding: 16px;
+            border-top: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #f9fff9;
+        }
+
+        select {
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid var(--green);
+        }
+
+        .update-btn {
+            background: var(--green);
+            color: white;
+            border: none;
+            padding: 8px 13px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-left: 6px;
+        }
+
+        .update-btn:hover {
+            background: var(--dark-green);
+        }
+
+        .paid {
+            color: green;
+            font-weight: bold;
+        }
+
+        .unpaid {
+            color: red;
+            font-weight: bold;
+        }
+
+        .empty-row {
+            text-align: center;
+            color: #777;
         }
     </style>
 </head>
+
 <body>
 
-<div class="navbar">
-    <strong>Worker</strong>
-
-    <div class="nav-links">
-        <a th:href="@{/worker/dashboard}">Product</a>
-        <a th:href="@{/worker/sales}">Sales</a>
-        <a th:href="@{/worker/report}">Report</a>
-        <a th:href="@{/worker/debt}">Debt</a>
+<div class="sidebar">
+    <div class="brand">
+        <div class="logo-circle">B</div>
+        <div>
+            <h2>BMS</h2>
+            <p>BAR MANAGEMENT SYSTEM</p>
+        </div>
     </div>
 
-    <form th:action="@{/logout}" method="post">
-        <button class="logout" type="submit">Logout</button>
+    <div class="side-links">
+        <a th:href="@{/worker/dashboard}">📦 Product</a>
+        <a th:href="@{/worker/sales}">🛒 Sales</a>
+        <a th:href="@{/worker/report}">📊 Report</a>
+        <a th:href="@{/worker/debt}" class="active">💳 Debt</a>
+    </div>
+
+    <form th:action="@{/logout}" method="post" class="logout-form">
+        <button type="submit">🚪 Logout</button>
     </form>
 </div>
 
-<div class="content">
-    <h2>Debt Records</h2>
+<div class="main-content">
 
-    <table>
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Customer</th>
-            <th>Phone</th>
-            <th>Email</th>
-            <th>Amount</th>
-            <th>Date</th>
-            <th>Status</th>
-        </tr>
-        </thead>
+    <div class="topbar">
+        <h1>My Debt Records</h1>
+        <div class="role-pill">Worker</div>
+    </div>
 
-        <tbody>
-        <tr th:each="debt : ${debts}">
-            <td th:text="${debt.id}"></td>
-            <td th:text="${debt.customerName}"></td>
-            <td th:text="${debt.customerPhone}"></td>
-            <td th:text="${debt.customerEmail}"></td>
-            <td><span th:text="${debt.totalAmount}"></span> RWF</td>
-            <td th:text="${debt.dateTime}"></td>
-            <td>
-                <form th:action="@{/worker/debt/update}" method="post">
-                    <input type="hidden" name="id" th:value="${debt.id}">
+    <div class="container">
+        <div class="table-card">
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Customer</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
 
-                    <select name="status">
-                        <option value="UNPAID" th:selected="${debt.status == 'UNPAID'}">UNPAID</option>
-                        <option value="PAID" th:selected="${debt.status == 'PAID'}">PAID</option>
-                    </select>
+                <tbody>
+                <tr th:each="debt : ${debts}">
+                    <td th:text="${debt.id}"></td>
+                    <td th:text="${debt.customerName}"></td>
+                    <td th:text="${debt.customerPhone}"></td>
+                    <td th:text="${debt.customerEmail}"></td>
+                    <td><span th:text="${debt.totalAmount}"></span> RWF</td>
+                    <td th:text="${debt.dateTime}"></td>
 
-                    <button type="submit">Update</button>
-                </form>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+                    <td>
+                        <form th:action="@{/worker/debt/update}" method="post">
+                            <input type="hidden" name="id" th:value="${debt.id}">
+
+                            <select name="status">
+                                <option value="UNPAID" th:selected="${debt.status == 'UNPAID'}">UNPAID</option>
+                                <option value="PAID" th:selected="${debt.status == 'PAID'}">PAID</option>
+                            </select>
+
+                            <button type="submit" class="update-btn">Update</button>
+                        </form>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(debts)}">
+                    <td colspan="7" class="empty-row">No debt records found.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 </div>
 
 </body>

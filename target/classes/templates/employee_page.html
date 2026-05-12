@@ -3,169 +3,436 @@
 <head>
     <meta charset="UTF-8">
     <title>BMS - Employee Management</title>
+
     <style>
-        /* General Styles */
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background-color: #ffffff; padding-bottom: 60px; }
-
-        /* Navbar Styling */
-        .navbar { background-color: #6200EE; padding: 10px 20px; display: flex; align-items: center; color: white; }
-        .nav-links { display: flex; gap: 30px; margin-left: auto; margin-right: auto; }
-        .nav-links a { color: white; text-decoration: none; font-weight: 500; }
-        .navbar {height: 55px;background: #00a859;display: flex;align-items: center;justify-content: space-between;padding: 0 30px;color: white;}
-        .log {
-            background-color: #00a859;
-            border-radius: 13px;
-            width: 90px;
-            color: white;
-            text-align: center;
-            padding: 8px;
-            cursor: pointer;
-            border: none;
-        }
-        /* Container & Header */
-        .container { padding: 40px; }
-        .header-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        h2 { margin: 0; font-size: 24px; }
-
-        /* "New +" Button */
-        .btn-new {
-            background-color: #6200EE; color: white; border: none;
-            padding: 10px 25px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px;
+        :root {
+            --green: #00a859;
+            --dark-green: #007a3d;
+            --deep-green: #003f24;
+            --light-bg: #f4f6f5;
         }
 
-        /* Table Styling matching your design */
-        .employee-table { width: 100%; border-collapse: collapse; }
-        .employee-table th {
-            background-color: #D9D9D9;
-            border: 1px solid #999;
-            padding: 12px;
-            text-align: left;
-            text-transform: lowercase; /* Matches your design labels */
-            font-weight: bold;
+        body{
+            margin:0;
+            font-family:'Segoe UI',sans-serif;
+            background:var(--light-bg);
         }
-        .employee-table td { border: 1px solid #999; padding: 12px; font-size: 14px; }
 
-        /* Action Buttons */
-        .action-btn { text-decoration: none; margin-right: 15px; background: none; border: none; cursor: pointer; font-size: 18px; }
-        .edit-btn { color: #4CAF50; }
-        .delete-btn { color: #F44336; }
+        /* Sidebar */
+        .sidebar{
+            position:fixed;
+            left:0;
+            top:0;
+            width:255px;
+            height:100vh;
+            background:linear-gradient(180deg,#006b38,#003f24);
+            color:white;
+            padding:25px 18px;
+            box-sizing:border-box;
+        }
 
-        /* Modal (Popup) Styles */
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
-        .modal-content { background-color: white; margin: 10% auto; padding: 30px; border-radius: 10px; width: 400px; position: relative; }
-        .close { position: absolute; right: 20px; top: 10px; font-size: 28px; cursor: pointer; color: #aaa; }
-        .close:hover { color: black; }
+        .brand{
+            display:flex;
+            align-items:center;
+            gap:12px;
+            margin-bottom:40px;
+        }
 
-        /* Form Styles inside Modal */
-        form input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        .btn-save { background-color: #6200EE; color: white; width: 100%; padding: 12px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 10px; }
+        .logo-circle{
+            width:55px;
+            height:55px;
+            border-radius:50%;
+            background:#00a859;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            font-size:28px;
+            font-weight:bold;
+        }
 
-        /* Footer */
-        .footer { position: fixed; bottom: 0; width: 100%; height: 40px; background-color: #2C446E; }
+        .brand h2{
+            margin:0;
+            font-size:28px;
+        }
+
+        .brand p{
+            margin:0;
+            font-size:11px;
+            opacity:0.8;
+        }
+
+        .side-links{
+            display:flex;
+            flex-direction:column;
+            gap:15px;
+        }
+
+        .side-links a{
+            color:white;
+            text-decoration:none;
+            padding:14px 18px;
+            border-radius:12px;
+            font-weight:600;
+        }
+
+        .side-links a:hover,
+        .side-links .active{
+            background:rgba(255,255,255,0.18);
+        }
+
+        .logout-form{
+            position:absolute;
+            bottom:25px;
+            left:18px;
+            right:18px;
+        }
+
+        .logout-form button{
+            width:100%;
+            background:transparent;
+            border:1px solid rgba(255,255,255,0.3);
+            color:white;
+            padding:13px;
+            border-radius:12px;
+            cursor:pointer;
+            font-size:16px;
+            text-align:left;
+        }
+
+        /* Main content */
+        .main-content{
+            margin-left:255px;
+        }
+
+        .topbar{
+            height:70px;
+            background:white;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:0 35px;
+            box-shadow:0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .topbar h1{
+            margin:0;
+            color:var(--dark-green);
+        }
+
+        .role-pill{
+            background:#e6fff0;
+            color:var(--dark-green);
+            padding:8px 18px;
+            border-radius:20px;
+            font-weight:bold;
+        }
+
+        .container{
+            padding:35px;
+        }
+
+        .header-section{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:25px;
+        }
+
+        .btn-new{
+            background:#00a859;
+            color:white;
+            border:none;
+            padding:13px 28px;
+            border-radius:12px;
+            cursor:pointer;
+            font-weight:bold;
+            font-size:15px;
+        }
+
+        .btn-new:hover{
+            background:#007a3d;
+        }
+
+        /* Table */
+        .table-card{
+            background:white;
+            border-radius:18px;
+            overflow:hidden;
+            box-shadow:0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .employee-table{
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        .employee-table th{
+            background:#f3f4f6;
+            padding:18px;
+            text-align:left;
+            font-weight:600;
+        }
+
+        .employee-table td{
+            padding:18px;
+            border-top:1px solid #eee;
+        }
+
+        .employee-table tr:hover{
+            background:#f9fff9;
+        }
+
+        /* Buttons */
+        .action-btn{
+            border:none;
+            cursor:pointer;
+            background:none;
+            font-size:18px;
+            margin-right:10px;
+        }
+
+        .edit-btn{
+            color:#00a859;
+        }
+
+        .delete-btn{
+            color:red;
+            text-decoration:none;
+        }
+
+        /* Modal */
+        .modal{
+            display:none;
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.4);
+            z-index:1000;
+        }
+
+        .modal-content{
+            background:white;
+            width:430px;
+            margin:6% auto;
+            border-radius:18px;
+            padding:30px;
+            position:relative;
+        }
+
+        .close{
+            position:absolute;
+            top:15px;
+            right:20px;
+            font-size:30px;
+            cursor:pointer;
+        }
+
+        .modal-content h3{
+            margin-top:0;
+            color:#007a3d;
+        }
+
+        .modal-content input{
+            width:100%;
+            padding:12px;
+            margin:10px 0;
+            border:1px solid #ccc;
+            border-radius:10px;
+            box-sizing:border-box;
+        }
+
+        .btn-save{
+            width:100%;
+            background:#00a859;
+            color:white;
+            border:none;
+            padding:13px;
+            border-radius:12px;
+            cursor:pointer;
+            font-weight:bold;
+            margin-top:10px;
+        }
+
+        .empty-row{
+            text-align:center;
+            color:#777;
+        }
     </style>
 </head>
+
 <body>
 
-<div class="navbar">
-    <div class="admin-btn">Admin</div>
-    <div class="nav-links">
-        <a th:href="@{/admin/dashboard}">product</a>
-        <a th:href="@{/admin/employee}">Employee</a>
-        <a th:href="@{/admin/report}">Report</a>
-        <a th:href="@{/admin/debt}">debt</a>
+<div class="sidebar">
+
+    <div class="brand">
+        <div class="logo-circle">B</div>
+        <div>
+            <h2>BMS</h2>
+            <p>BAR MANAGEMENT SYSTEM</p>
+        </div>
     </div>
-    <div>
-        <form th:action="@{/logout}" method="post">
-            <button type="submit" class="log">Logout</button>
-        </form>
+
+    <div class="side-links">
+        <a th:href="@{/admin/dashboard}">📦 Products</a>
+        <a th:href="@{/admin/employee}" class="active">👥 Employees</a>
+        <a th:href="@{/admin/report}">📊 Reports</a>
+        <a th:href="@{/admin/debt}">💳 Debts</a>
+    </div>
+
+    <form th:action="@{/logout}" method="post" class="logout-form">
+        <button type="submit">🚪 Logout</button>
+    </form>
+
+</div>
+
+<div class="main-content">
+
+    <div class="topbar">
+        <h1>Employee Management</h1>
+        <div class="role-pill">Admin</div>
+    </div>
+
+    <div class="container">
+
+        <div class="header-section">
+            <h2>My Employees</h2>
+            <button class="btn-new" onclick="openNewModal()">
+                + New Employee
+            </button>
+        </div>
+
+        <div class="table-card">
+
+            <table class="employee-table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Position</th>
+                    <th>Phone</th>
+                    <th>Username</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <tr th:each="emp, iter : ${employees}">
+                    <td th:text="${iter.count}">1</td>
+                    <td th:text="${emp.name}"></td>
+                    <td th:text="${emp.position}"></td>
+                    <td th:text="${emp.phone}"></td>
+                    <td th:text="${emp.username}"></td>
+
+                    <td>
+
+                        <button class="action-btn edit-btn"
+                                th:data-id="${emp.id}"
+                                th:data-name="${emp.name}"
+                                th:data-position="${emp.position}"
+                                th:data-phone="${emp.phone}"
+                                th:data-username="${emp.username}"
+                                th:data-password="${emp.password}"
+                                onclick="prepareEdit(this)">
+                            ✏️
+                        </button>
+
+                        <a th:href="@{'/admin/employee/delete/' + ${emp.id}}"
+                           class="action-btn delete-btn"
+                           onclick="return confirm('Delete this employee?')">
+                            🗑️
+                        </a>
+
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(employees)}">
+                    <td colspan="6" class="empty-row">
+                        No employees found.
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+
+        </div>
     </div>
 </div>
 
-
-<div class="container">
-    <div class="header-section">
-        <h2>My Employees</h2>
-        <button class="btn-new" onclick="openNewModal()">New +</button>
-    </div>
-
-    <table class="employee-table">
-        <thead>
-        <tr>
-            <th>number</th>
-            <th>name</th>
-            <th>position</th>
-            <th>phone</th>
-            <th>username</th>
-            <th>action</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="emp, iter : ${employees}">
-            <td th:text="${iter.count}">1</td>
-            <td th:text="${emp.name}">Name</td>
-            <td th:text="${emp.position}">Position</td>
-            <td th:text="${emp.phone}">Phone</td>
-            <td th:text="${emp.username}">Username</td>
-            <td>
-                <button class="action-btn edit-btn"
-                        th:data-id="${emp.id}"
-                        th:data-name="${emp.name}"
-                        th:data-position="${emp.position}"
-                        th:data-phone="${emp.phone}"
-                        th:data-username="${emp.username}"
-                        th:data-password="${emp.password}"
-                        onclick="prepareEdit(this)">
-                    ✏️
-                </button>
-                <a th:href="@{'/admin/employee/delete/' + ${emp.id}}"
-                   class="action-btn delete-btn"
-                   onclick="return confirm('Delete this employee?')">🗑️</a>
-            </td>
-        </tr>
-        <tr th:if="${#lists.isEmpty(employees)}">
-            <td colspan="6" style="text-align: center; color: #999;">No employees found.</td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-
+<!-- Modal -->
 <div id="empModal" class="modal">
     <div class="modal-content">
+
         <span class="close" onclick="closeModal()">&times;</span>
-        <h3 id="modalTitle">Add New Employee</h3>
+
+        <h3 id="modalTitle">
+            Add New Employee
+        </h3>
+
         <form th:action="@{/admin/employee/save}" method="post">
+
             <input type="hidden" id="empId" name="id">
 
-            <input type="text" id="empName" name="name" placeholder="Full Name" required>
-            <input type="text" id="empPosition" name="position" placeholder="Position" required>
-            <input type="text" id="empPhone" name="phone" placeholder="Phone Number" required>
-            <input type="text" id="empUsername" name="username" placeholder="Login Username" required>
-            <input type="password" id="empPassword" name="password" placeholder="Password" required>
+            <input type="text"
+                   id="empName"
+                   name="name"
+                   placeholder="Full Name"
+                   required>
 
-            <button type="submit" class="btn-save" id="saveBtn">Save Employee</button>
+            <input type="text"
+                   id="empPosition"
+                   name="position"
+                   placeholder="Position"
+                   required>
+
+            <input type="text"
+                   id="empPhone"
+                   name="phone"
+                   placeholder="Phone Number"
+                   required>
+
+            <input type="text"
+                   id="empUsername"
+                   name="username"
+                   placeholder="Login Username"
+                   required>
+
+            <input type="password"
+                   id="empPassword"
+                   name="password"
+                   placeholder="Password"
+                   required>
+
+            <button type="submit"
+                    class="btn-save"
+                    id="saveBtn">
+                Save Employee
+            </button>
+
         </form>
+
     </div>
 </div>
 
-<div class="footer"></div>
-
 <script>
-    // 1. This function safely reads the data attributes
     function prepareEdit(button) {
-        const id = button.getAttribute('data-id');
-        const name = button.getAttribute('data-name');
-        const position = button.getAttribute('data-position');
-        const phone = button.getAttribute('data-phone');
-        const username = button.getAttribute('data-username');
-        const password = button.getAttribute('data-password');
 
-        // 2. Call the original function to fill the modal
-        editEmployee(id, name, position, phone, username, password);
+        editEmployee(
+            button.dataset.id,
+            button.dataset.name,
+            button.dataset.position,
+            button.dataset.phone,
+            button.dataset.username,
+            button.dataset.password
+        );
     }
 
-    function editEmployee(id, name, position, phone, username, password) {
-        document.getElementById('modalTitle').innerText = "Edit Employee";
-        document.getElementById('saveBtn').innerText = "Update Employee";
+    function editEmployee(id,name,position,phone,username,password){
+
+        document.getElementById('modalTitle').innerText =
+            "Edit Employee";
+
+        document.getElementById('saveBtn').innerText =
+            "Update Employee";
 
         document.getElementById('empId').value = id;
         document.getElementById('empName').value = name;
@@ -174,24 +441,36 @@
         document.getElementById('empUsername').value = username;
         document.getElementById('empPassword').value = password;
 
-        document.getElementById('empModal').style.display = 'block';
+        document.getElementById('empModal').style.display =
+            'block';
     }
 
-    function openNewModal() {
-        document.getElementById('modalTitle').innerText = "Add New Employee";
-        document.getElementById('saveBtn').innerText = "Save Employee";
+    function openNewModal(){
+
+        document.getElementById('modalTitle').innerText =
+            "Add New Employee";
+
+        document.getElementById('saveBtn').innerText =
+            "Save Employee";
+
         document.getElementById('empId').value = "";
+
         document.querySelector('form').reset();
-        document.getElementById('empModal').style.display = 'block';
+
+        document.getElementById('empModal').style.display =
+            'block';
     }
 
-    function closeModal() {
-        document.getElementById('empModal').style.display = 'none';
+    function closeModal(){
+        document.getElementById('empModal').style.display =
+            'none';
     }
 
-    window.onclick = function(event) {
-        let modal = document.getElementById('empModal');
-        if (event.target == modal) {
+    window.onclick = function(event){
+        let modal =
+            document.getElementById('empModal');
+
+        if(event.target == modal){
             closeModal();
         }
     }

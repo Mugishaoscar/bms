@@ -8,4 +8,7 @@ import java.util.List;
 public interface DebtRepository extends JpaRepository<Debt, Long> {
 
     List<Debt> findAllByOrderByDateTimeDesc();
+
+    List<Debt> findByWorkerIdOrderByDateTimeDesc(Long workerId);
+    List<Debt> findByBossIdOrderByDateTimeDesc(Long bossId);
 }

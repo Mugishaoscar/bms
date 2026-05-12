@@ -3,114 +3,269 @@
 <head>
     <meta charset="UTF-8">
     <title>BMS - Debt Management</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background-color: #ffffff; padding-bottom: 60px; }
 
-        /* Navbar Styling */
-        .navbar {
-            height: 55px;
-            background: #00a859;
+    <style>
+        :root {
+            --green: #00a859;
+            --dark-green: #007a3d;
+            --deep-green: #003f24;
+            --light-bg: #f4f6f5;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--light-bg);
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 255px;
+            height: 100vh;
+            background: linear-gradient(180deg,#006b38,#003f24);
+            color: white;
+            padding: 25px 18px;
+            box-sizing: border-box;
+        }
+
+        .brand {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 0 30px;
-            color: white;
+            gap: 12px;
+            margin-bottom: 40px;
         }
-        .log {
-            background-color: #00a859;
-            border-radius: 13px;
-            width: 90px;
+
+        .logo-circle {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: var(--green);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .brand h2 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .brand p {
+            margin: 0;
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+        .side-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .side-links a {
             color: white;
-            text-align: center;
-            padding: 8px;
+            text-decoration: none;
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .side-links a:hover,
+        .side-links .active {
+            background: rgba(255,255,255,0.18);
+        }
+
+        .logout-form {
+            position: absolute;
+            bottom: 25px;
+            left: 18px;
+            right: 18px;
+        }
+
+        .logout-form button {
+            width: 100%;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 13px;
+            border-radius: 12px;
             cursor: pointer;
-            border: none;
+            font-size: 16px;
+            text-align: left;
         }
-        .nav-links { display: flex; gap: 30px; margin-left: auto; margin-right: auto; }
-        .nav-links a { color: white; text-decoration: none; font-weight: 500; }
-        .admin-btn { background: white; color: #00a859; padding: 5px 25px; border-radius: 20px; font-weight: bold; }
 
-        /* Content Container */
-        .container { padding: 40px; }
-        h2 { margin-bottom: 20px; }
+        .main-content {
+            margin-left: 255px;
+        }
 
-        /* Table Styling matching your screenshot */
+        .topbar {
+            height: 70px;
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 35px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .topbar h1 {
+            margin: 0;
+            color: var(--dark-green);
+        }
+
+        .role-pill {
+            background: #e6fff0;
+            color: var(--dark-green);
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .container {
+            padding: 35px;
+        }
+
+        .table-card {
+            background: white;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
         .debt-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
         }
 
         .debt-table th {
-            background-color: #D9D9D9; /* Grey header from design */
-            border: 1px solid #999;
-            padding: 12px;
+            background: #f3f4f6;
+            padding: 16px;
             text-align: left;
-            font-weight: bold;
-            text-transform: lowercase; /* Matches your image labels */
         }
 
         .debt-table td {
-            border: 1px solid #999;
-            padding: 12px;
-            font-size: 14px;
+            padding: 16px;
+            border-top: 1px solid #eee;
         }
 
-        /* Footer */
-        .footer { position: fixed; bottom: 0; width: 100%; height: 40px; background-color: #2C446E; }
+        .debt-table tr:hover {
+            background: #f9fff9;
+        }
+
+        select {
+            padding: 7px;
+            border-radius: 7px;
+            border: 1px solid var(--green);
+        }
+
+        .update-btn {
+            background: var(--green);
+            color: white;
+            border: none;
+            padding: 8px 13px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 6px;
+        }
+
+        .update-btn:hover {
+            background: var(--dark-green);
+        }
+
+        .empty-row {
+            text-align: center;
+            color: #777;
+        }
     </style>
 </head>
+
 <body>
 
-<div class="navbar">
-    <div class="admin-btn">Admin</div>
-    <div class="nav-links">
-        <a th:href="@{/admin/dashboard}">product</a>
-        <a th:href="@{/admin/employee}">Employee</a>
-        <a th:href="@{/admin/report}">Report</a>
-        <a th:href="@{/admin/debt}">debt</a>
+<div class="sidebar">
+    <div class="brand">
+        <div class="logo-circle">B</div>
+        <div>
+            <h2>BMS</h2>
+            <p>BAR MANAGEMENT SYSTEM</p>
+        </div>
     </div>
-    <div>
-        <form th:action="@{/logout}" method="post">
-            <button type="submit" class="log">Logout</button>
-        </form>
+
+    <div class="side-links">
+        <a th:href="@{/admin/dashboard}">📦 Products</a>
+        <a th:href="@{/admin/employee}">👥 Employees</a>
+        <a th:href="@{/admin/report}">📊 Reports</a>
+        <a th:href="@{/admin/debt}" class="active">💳 Debts</a>
     </div>
+
+    <form th:action="@{/logout}" method="post" class="logout-form">
+        <button type="submit">🚪 Logout</button>
+    </form>
 </div>
 
+<div class="main-content">
 
-<div class="container">
-    <h2>Debt List</h2>
+    <div class="topbar">
+        <h1>Debt Management</h1>
+        <div class="role-pill">Admin</div>
+    </div>
 
-    <table class="debt-table">
-        <thead>
-        <tr>
-            <th>number</th>
-            <th>name</th>
-            <th>items</th>
-            <th>phone</th>
-            <th>amount</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="debt, iterStat : ${debts}">
-            <td th:text="${iterStat.count}">1</td>
-            <td th:text="${debt.name}">Name</td>
-            <td th:text="${debt.items}">Items</td>
-            <td th:text="${debt.phone}">Phone</td>
-            <td th:text="${debt.amount}">Amount</td>
-        </tr>
+    <div class="container">
+        <h2>Debt List</h2>
 
-        <tr th:if="${#lists.isEmpty(debts)}">
-            <td>&nbsp;</td><td></td><td></td><td></td><td></td>
-        </tr>
-        <tr th:if="${#lists.isEmpty(debts)}">
-            <td>&nbsp;</td><td></td><td></td><td></td><td></td>
-        </tr>
-        </tbody>
-    </table>
+        <div class="table-card">
+            <table class="debt-table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Customer</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Items</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="debt, iterStat : ${debts}">
+                    <td th:text="${iterStat.count}"></td>
+                    <td th:text="${debt.customerName}"></td>
+                    <td th:text="${debt.customerPhone}"></td>
+                    <td th:text="${debt.customerEmail}"></td>
+                    <td th:text="${debt.items}"></td>
+                    <td><span th:text="${debt.totalAmount}"></span> RWF</td>
+                    <td th:text="${debt.dateTime}"></td>
+
+                    <td>
+                        <form th:action="@{/admin/debt/update-status}" method="post">
+                            <input type="hidden" name="id" th:value="${debt.id}">
+
+                            <select name="status">
+                                <option value="UNPAID" th:selected="${debt.status == 'UNPAID'}">UNPAID</option>
+                                <option value="PAID" th:selected="${debt.status == 'PAID'}">PAID</option>
+                            </select>
+
+                            <br>
+
+                            <button type="submit" class="update-btn">Update</button>
+                        </form>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(debts)}">
+                    <td colspan="8" class="empty-row">No debts found</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 </div>
-
-<div class="footer"></div>
 
 </body>
 </html>

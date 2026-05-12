@@ -4,184 +4,415 @@
     <title>Worker Dashboard</title>
 
     <style>
+        :root {
+            --green:#00a859;
+            --dark-green:#007a3d;
+            --deep-green:#003f24;
+            --bg:#f4f6f5;
+        }
+
         body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: white;
+            margin:0;
+            font-family:'Segoe UI', sans-serif;
+            background:var(--bg);
         }
 
-        .navbar {
-            height: 55px;
-            background: #00a859;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 30px;
-            color: white;
+        .sidebar {
+            position:fixed;
+            left:0;
+            top:0;
+            width:255px;
+            height:100vh;
+            background:linear-gradient(180deg,#006b38,#003f24);
+            color:white;
+            padding:25px 18px;
+            box-sizing:border-box;
         }
 
-        .role {
-            background: white;
-            color: #00a859;
-            padding: 5px 25px;
-            border-radius: 10px;
-            font-weight: bold;
+        .brand {
+            display:flex;
+            align-items:center;
+            gap:12px;
+            margin-bottom:40px;
         }
 
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            margin: 0 20px;
-            font-size: 16px;
+        .logo-circle {
+            width:55px;
+            height:55px;
+            border-radius:50%;
+            background:var(--green);
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            font-size:28px;
+            font-weight:bold;
         }
 
-        .logout {
-            background: #007a3d;
-            color: white;
-            border: none;
-            padding: 8px 18px;
-            border-radius: 10px;
-            cursor: pointer;
+        .brand h2 { margin:0; font-size:28px; }
+        .brand p { margin:0; font-size:11px; opacity:.8; }
+
+        .side-links {
+            display:flex;
+            flex-direction:column;
+            gap:15px;
         }
 
-        .content {
-            padding: 50px;
+        .side-links a {
+            color:white;
+            text-decoration:none;
+            padding:14px 18px;
+            border-radius:12px;
+            font-weight:600;
+        }
+
+        .side-links a:hover,
+        .side-links .active {
+            background:rgba(255,255,255,.18);
+        }
+
+        .logout-form {
+            position:absolute;
+            bottom:25px;
+            left:18px;
+            right:18px;
+        }
+
+        .logout-form button {
+            width:100%;
+            background:transparent;
+            border:1px solid rgba(255,255,255,.3);
+            color:white;
+            padding:13px;
+            border-radius:12px;
+            cursor:pointer;
+            font-size:16px;
+            text-align:left;
+        }
+
+        .main-content {
+            margin-left:255px;
+        }
+
+        .topbar {
+            height:80px;
+            background:white;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:0 35px;
+            box-shadow:0 2px 10px rgba(0,0,0,.08);
+        }
+
+        .topbar h1 {
+            margin:0;
+            color:var(--dark-green);
+        }
+
+        .topbar p {
+            margin:4px 0 0;
+            color:#666;
+        }
+
+        .role-pill {
+            background:#e6fff0;
+            color:var(--dark-green);
+            padding:10px 20px;
+            border-radius:20px;
+            font-weight:bold;
+        }
+
+        .container {
+            padding:35px;
+        }
+
+        .summary-row {
+            background:white;
+            border-radius:18px;
+            padding:25px;
+            display:flex;
+            gap:40px;
+            margin-bottom:35px;
+            box-shadow:0 5px 15px rgba(0,0,0,.08);
+        }
+
+        .summary-card {
+            flex:1;
+            border-right:1px solid #ddd;
+        }
+
+        .summary-card:last-child {
+            border-right:none;
+        }
+
+        .summary-card span {
+            color:#666;
+        }
+
+        .summary-card h2 {
+            margin:8px 0 0;
+            color:var(--dark-green);
+            font-size:30px;
         }
 
         .product-grid {
-            display: flex;
-            gap: 35px;
-            flex-wrap: wrap;
+            display:flex;
+            gap:30px;
+            flex-wrap:wrap;
         }
 
         .product-card {
-            width: 190px;
-            background: #d9d9d9;
-            border-radius: 8px;
-            padding: 8px;
-            text-align: center;
+            width:270px;
+            background:white;
+            border-radius:18px;
+            padding:18px;
+            box-shadow:0 5px 15px rgba(0,0,0,.08);
+            transition:.25s;
+        }
+
+        .product-card:hover {
+            transform:translateY(-6px);
+            box-shadow:0 10px 22px rgba(0,0,0,.15);
         }
 
         .product-card img {
-            width: 100%;
-            height: 170px;
-            object-fit: contain;
-            background: white;
-            border-radius: 5px;
+            width:100%;
+            height:210px;
+            object-fit:contain;
+            background:white;
+            border:1px solid #ddd;
+            border-radius:14px;
         }
 
         .product-info {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 8px;
-            font-weight: bold;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-top:16px;
+            font-weight:bold;
+            font-size:20px;
+        }
+
+        .stock {
+            color:var(--dark-green);
         }
 
         .buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
+            display:flex;
+            justify-content:space-between;
+            margin-top:20px;
         }
 
-        .sold-btn {
-            background: #00b050;
-            color: white;
-            border: none;
-            padding: 7px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
+        .sold-btn,
         .debt-btn {
-            background: #ff3333;
-            color: white;
-            border: none;
-            padding: 7px 16px;
-            border-radius: 8px;
-            cursor: pointer;
+            color:white;
+            border:none;
+            padding:11px 25px;
+            border-radius:10px;
+            cursor:pointer;
+            font-weight:bold;
+            font-size:15px;
+        }
+
+        .sold-btn { background:var(--green); }
+        .debt-btn { background:#ff2e2e; }
+
+        .empty-box {
+            background:white;
+            padding:35px;
+            border-radius:15px;
+            color:#777;
+        }
+
+        .popup {
+            display:none;
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,.45);
+            justify-content:center;
+            align-items:center;
+            z-index:1000;
+        }
+
+        .popup-card {
+            background:white;
+            padding:28px;
+            border-radius:18px;
+            width:480px;
+            box-shadow:0 10px 30px rgba(0,0,0,.25);
+        }
+
+        .popup-card h2 {
+            color:var(--dark-green);
+            margin-top:0;
+        }
+
+        .popup-card input,
+        .popup-card select {
+            width:100%;
+            padding:12px;
+            margin:8px 0;
+            border:1px solid #ccc;
+            border-radius:10px;
+            box-sizing:border-box;
+        }
+
+        .item-row {
+            display:grid;
+            grid-template-columns:2fr 1fr;
+            gap:10px;
+        }
+
+        .add-btn {
+            background:#e6fff0;
+            color:var(--dark-green);
+            border:none;
+            padding:10px 15px;
+            border-radius:10px;
+            cursor:pointer;
+            font-weight:bold;
+        }
+
+        .cancel-btn {
+            background:#777;
+            color:white;
+            border:none;
+            padding:11px 20px;
+            border-radius:10px;
+            cursor:pointer;
         }
     </style>
 </head>
 
 <body>
 
-<div class="navbar">
-    <div class="role">Worker</div>
-
-    <div class="nav-links">
-        <a th:href="@{/worker/dashboard}">Product</a>
-        <a th:href="@{/worker/sales}">Sales</a>
-        <a th:href="@{/worker/report}">Report</a>
-        <a th:href="@{/worker/debt}">Debt</a>
-    </div>
-
-    <form th:action="@{/logout}" method="post">
-        <button class="logout" type="submit">Logout</button>
-    </form>
-</div>
-
-<div class="content">
-
-    <div class="product-grid">
-
-        <div class="product-card" th:each="product : ${products}">
-            <img th:src="@{'/images/' + ${product.imageUrl}}" alt="Product">
-
-            <div class="product-info">
-                <span th:text="${product.name}">Primus</span>
-                <span th:text="${product.stockQuantity}">12</span>
-            </div>
-
-            <div class="buttons">
-                <form th:action="@{/worker/sell}" method="post">
-                    <input type="hidden" name="productId" th:value="${product.id}">
-                    <button class="sold-btn" type="button" onclick="openSalePopup()">Sold</button>
-                </form>
-
-                <form th:action="@{/worker/debt/add}" method="get">
-                    <input type="hidden" name="productId" th:value="${product.id}">
-                    <button class="debt-btn" type="button" onclick="openDebtPopup()">Debt</button>
-                </form>
-            </div>
-            <div id="salePopup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); justify-content:center; align-items:center;">
-                <div style="background:white; padding:25px; border-radius:15px; width:420px;">
-                    <h2 style="color:#00a859;">Create Sale</h2>
-
-                    <form th:action="@{/worker/sale/create}" method="post">
-                        <input type="text" name="customerName" placeholder="Customer Name (optional)">
-                        <input type="text" name="customerPhone" placeholder="Phone (optional)">
-                        <input type="email" name="customerEmail" placeholder="Email (optional)">
-
-                        <hr>
-
-                        <div id="itemsBox">
-                            <div class="sale-item">
-                                <select name="productIds">
-                                    <option th:each="p : ${products}"
-                                            th:value="${p.id}"
-                                            th:text="${p.name}">
-                                    </option>
-                                </select>
-
-                                <input type="number" name="quantities" value="1" min="1">
-                            </div>
-                        </div>
-
-                        <button type="button" onclick="addItem()">+ Add Product</button>
-                        <br><br>
-
-                        <button class="sold-btn" type="submit">Save Sale</button>
-                        <button type="button" onclick="closeSalePopup()">Cancel</button>
-                    </form>
-                </div>
-            </div>
+<div class="sidebar">
+    <div class="brand">
+        <div class="logo-circle">B</div>
+        <div>
+            <h2>BMS</h2>
+            <p>BAR MANAGEMENT SYSTEM</p>
         </div>
     </div>
 
+    <div class="side-links">
+        <a th:href="@{/worker/dashboard}" class="active">📦 Product</a>
+        <a th:href="@{/worker/sales}">🛒 Sales</a>
+        <a th:href="@{/worker/report}">📊 Report</a>
+        <a th:href="@{/worker/debt}">💳 Debt</a>
+    </div>
+
+    <form th:action="@{/logout}" method="post" class="logout-form">
+        <button type="submit">🚪 Logout</button>
+    </form>
 </div>
-<div id="salePopup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); justify-content:center; align-items:center;">
-    <div style="background:white; padding:25px; border-radius:15px; width:420px;">
-        <h2 style="color:#00a859;">Create Sale</h2>
+
+
+<div class="main-content">
+
+    <div class="topbar">
+
+        <div>
+            <h1>Welcome, Worker!</h1>
+            <p>Here are your products and quick actions.</p>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:15px;">
+
+            <!-- Notification -->
+            <div class="notification-box">
+
+                🔔 Notifications
+
+                <span class="notif-count"
+                      th:text="${#lists.size(notifications)}">
+                0
+            </span>
+
+                <div class="notif-dropdown">
+
+                    <div th:each="n : ${notifications}"
+                         class="notif-item">
+
+                        <strong th:text="${n.message}">
+                            Notification
+                        </strong>
+
+                        <br>
+
+                        <small th:text="${n.createdAt}">
+                            Time
+                        </small>
+
+                    </div>
+
+                    <div th:if="${#lists.isEmpty(notifications)}"
+                         class="notif-item">
+                        No notifications yet.
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Worker Role -->
+            <div class="role-pill">
+                Worker
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="container">
+
+        <div class="summary-row">
+            <div class="summary-card">
+                <span>Total Products</span>
+                <h2 th:text="${#lists.size(products)}">0</h2>
+            </div>
+
+            <div class="summary-card">
+                <span>Action</span>
+                <h2>Sales</h2>
+            </div>
+
+            <div class="summary-card">
+                <span>Debt Mode</span>
+                <h2>Active</h2>
+            </div>
+        </div>
+
+        <h2>Available Products</h2>
+
+        <div class="empty-box" th:if="${#lists.isEmpty(products)}">
+            No products available.
+        </div>
+
+        <div class="product-grid" th:if="${!#lists.isEmpty(products)}">
+
+            <div class="product-card" th:each="product : ${products}" th:if="${product != null}">
+                <img th:src="${product.imageUrl != null and product.imageUrl != ''} ? @{'/images/' + ${product.imageUrl}} : 'https://via.placeholder.com/150'"
+                     alt="Product">
+
+                <div class="product-info">
+                    <span th:text="${product.name}">Product</span>
+                    <span class="stock" th:text="${product.stockQuantity}">0</span>
+                </div>
+
+                <div class="buttons">
+                    <button class="sold-btn" type="button" onclick="openSalePopup()">🛒 Sold</button>
+                    <button class="debt-btn" type="button" onclick="openDebtPopup()">💳 Debt</button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- SALE POPUP -->
+<div id="salePopup" class="popup">
+    <div class="popup-card">
+        <h2>Create Sale</h2>
 
         <form th:action="@{/worker/sale/create}" method="post">
             <input type="text" name="customerName" placeholder="Customer Name (optional)">
@@ -191,7 +422,7 @@
             <hr>
 
             <div id="itemsBox">
-                <div class="sale-item">
+                <div class="sale-item item-row">
                     <select name="productIds">
                         <option th:each="p : ${products}"
                                 th:value="${p.id}"
@@ -203,31 +434,51 @@
                 </div>
             </div>
 
-            <button type="button" onclick="addItem()">+ Add Product</button>
+            <br>
+            <button type="button" class="add-btn" onclick="addItem()">+ Add Product</button>
             <br><br>
 
             <button class="sold-btn" type="submit">Save Sale</button>
-            <button type="button" onclick="closeSalePopup()">Cancel</button>
+            <button type="button" class="cancel-btn" onclick="closeSalePopup()">Cancel</button>
         </form>
     </div>
 </div>
-<div id="debtPopup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); justify-content:center; align-items:center;">
-    <div style="background:white; padding:25px; border-radius:15px; width:420px;">
-        <h2 style="color:#00a859;">Record Debt</h2>
+
+<!-- DEBT POPUP -->
+<div id="debtPopup" class="popup">
+    <div class="popup-card">
+        <h2>Record Debt</h2>
 
         <form th:action="@{/worker/debt/create}" method="post">
             <input type="text" name="customerName" placeholder="Customer Name" required>
             <input type="text" name="customerPhone" placeholder="Phone Number">
             <input type="email" name="customerEmail" placeholder="Email">
 
-            <input type="text" name="items" placeholder="Items e.g Primus x2, Skol x1" required>
-            <input type="number" name="totalAmount" placeholder="Total Amount" required>
+            <hr>
+
+            <div id="debtItemsBox">
+                <div class="debt-item item-row">
+                    <select name="productIds">
+                        <option th:each="p : ${products}"
+                                th:value="${p.id}"
+                                th:text="${p.name}">
+                        </option>
+                    </select>
+
+                    <input type="number" name="quantities" value="1" min="1">
+                </div>
+            </div>
+
+            <br>
+            <button type="button" class="add-btn" onclick="addDebtItem()">+ Add Product</button>
+            <br><br>
 
             <button class="debt-btn" type="submit">Save Debt</button>
-            <button type="button" onclick="closeDebtPopup()">Cancel</button>
+            <button type="button" class="cancel-btn" onclick="closeDebtPopup()">Cancel</button>
         </form>
     </div>
 </div>
+
 <script>
     function openSalePopup() {
         document.getElementById("salePopup").style.display = "flex";
@@ -241,16 +492,24 @@
         const itemsBox = document.getElementById("itemsBox");
         const firstItem = document.querySelector(".sale-item");
         const newItem = firstItem.cloneNode(true);
-
         newItem.querySelector("input").value = 1;
         itemsBox.appendChild(newItem);
     }
+
     function openDebtPopup() {
         document.getElementById("debtPopup").style.display = "flex";
     }
 
     function closeDebtPopup() {
         document.getElementById("debtPopup").style.display = "none";
+    }
+
+    function addDebtItem() {
+        const itemsBox = document.getElementById("debtItemsBox");
+        const firstItem = document.querySelector(".debt-item");
+        const newItem = firstItem.cloneNode(true);
+        newItem.querySelector("input").value = 1;
+        itemsBox.appendChild(newItem);
     }
 </script>
 

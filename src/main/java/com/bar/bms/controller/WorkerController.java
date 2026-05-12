@@ -3,10 +3,8 @@ package com.bar.bms.controller;
 import com.bar.bms.model.DayReport;
 import com.bar.bms.model.Debt;
 import com.bar.bms.model.User;
-import com.bar.bms.repository.DayReportRepository;
-import com.bar.bms.repository.DebtRepository;
-import com.bar.bms.repository.SaleRepository;
-import com.bar.bms.repository.UserRepository;
+import com.bar.bms.repository.*;
+import com.bar.bms.service.DebtService;
 import com.bar.bms.service.ProductService;
 import com.bar.bms.service.SaleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +28,9 @@ public class WorkerController {
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private NotificationRepository notificationRepository;
+
     @GetMapping("/dashboard")
     public String workerDashboard(Model model) {
         User worker = getLoggedInUser();
@@ -39,6 +40,8 @@ public class WorkerController {
         } else {
             model.addAttribute("products", productService.getAllProducts());
         }
+        model.addAttribute("notifications",
+                notificationRepository.findByBossIdOrderByCreatedAtDesc(worker.getBossId()));
         return "worker_dashboard";
     }
 
@@ -57,20 +60,27 @@ public class WorkerController {
     private SaleRepository saleRepository;
     @GetMapping("/sales")
     public String workerSales(Model model) {
-        model.addAttribute("sales", saleRepository.findAllByOrderByDateTimeDesc());
+        User worker = getLoggedInUser();
+
+        model.addAttribute("sales",
+                saleRepository.findByWorkerIdOrderByDateTimeDesc(worker.getId()));
+
         return "worker_sales";
     }
 
     @GetMapping("/report")
     public String workerReport(Model model) {
-        Double totalSales = saleRepository.getTotalSalesAmount();
+        User worker = getLoggedInUser();
+
+        Double totalSales = saleRepository.getTotalSalesAmountByWorkerId(worker.getId());
 
         if (totalSales == null) {
             totalSales = 0.0;
         }
 
         model.addAttribute("totalSales", totalSales);
-        model.addAttribute("sales", saleRepository.findAllByOrderByDateTimeDesc());
+        model.addAttribute("sales",
+                saleRepository.findByWorkerIdOrderByDateTimeDesc(worker.getId()));
 
         return "worker_report";
     }
@@ -138,35 +148,39 @@ public class WorkerController {
     private DebtRepository debtRepository;
     @GetMapping("/debt")
     public String workerDebt(Model model) {
-        model.addAttribute("debts", debtRepository.findAllByOrderByDateTimeDesc());
+        User worker = getLoggedInUser();
+
+        model.addAttribute("debts",
+                debtRepository.findByWorkerIdOrderByDateTimeDesc(worker.getId()));
+
         return "worker_debt";
     }
+    @Autowired
+    private DebtService debtService;
     @PostMapping("/debt/create")
     public String createDebt(@RequestParam String customerName,
                              @RequestParam(required = false) String customerPhone,
                              @RequestParam(required = false) String customerEmail,
-                             @RequestParam String items,
-                             @RequestParam Double totalAmount) {
+                             @RequestParam Long[] productIds,
+                             @RequestParam Integer[] quantities) {
 
-        Debt debt = new Debt();
-        debt.setCustomerName(customerName);
-        debt.setCustomerPhone(customerPhone);
-        debt.setCustomerEmail(customerEmail);
-        debt.setItems(items);
-        debt.setTotalAmount(totalAmount);
-        debt.setDateTime(LocalDateTime.now());
         User worker = getLoggedInUser();
 
         if (worker != null) {
-            debt.setWorkerId(worker.getId());
-            debt.setBossId(worker.getBossId());
+            debtService.createDebt(
+                    customerName,
+                    customerPhone,
+                    customerEmail,
+                    productIds,
+                    quantities,
+                    worker.getId(),
+                    worker.getBossId()
+            );
         }
-        debt.setStatus("UNPAID");
-
-        debtRepository.save(debt);
 
         return "redirect:/worker/debt";
     }
+
     @PostMapping("/debt/update")
     public String updateDebtStatus(@RequestParam Long id,
                                    @RequestParam String status) {
@@ -188,5 +202,6 @@ public class WorkerController {
 
         return userRepository.findByUsername(username).orElse(null);
     }
+
 
 }
