@@ -464,7 +464,7 @@
         <div class="product-grid" th:if="${!#lists.isEmpty(products)}">
 
             <div class="product-card" th:each="product : ${products}" th:if="${product != null}">
-                <img th:src="${product.imageUrl != null and product.imageUrl != ''} ? @{'/images/' + ${product.imageUrl}} : 'https://via.placeholder.com/150'"
+                <img th:src="${product.imageUrl != null and product.imageUrl != ''} ? @{'/uploads/images/' + ${product.imageUrl}} : 'https://via.placeholder.com/150'"
                      alt="Product">
 
                 <div class="product-info">

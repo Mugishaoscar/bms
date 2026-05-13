@@ -30,9 +30,10 @@ public class WorkerController {
 
     @Autowired
     private ProductService productService;
-
     @Autowired
     private NotificationRepository notificationRepository;
+
+
 
     @GetMapping("/dashboard")
     public String workerDashboard(Model model) {
@@ -153,6 +154,15 @@ public class WorkerController {
         report.setStatus("SUBMITTED");
 
         dayReportRepository.save(report);
+        Notification notification = new Notification();
+        notification.setBossId(worker.getBossId());
+        notification.setMessage("Worker " + worker.getUsername()
+                + " ended the day. Total earned: "
+                + totalSales + " RWF");
+        notification.setCreatedAt(LocalDateTime.now());
+        notification.setSeen(false);
+
+        notificationRepository.save(notification);
 
         return "redirect:/worker/report";
     }
@@ -196,12 +206,27 @@ public class WorkerController {
     @PostMapping("/debt/update")
     public String updateDebtStatus(@RequestParam Long id,
                                    @RequestParam String status) {
+        User worker = getLoggedInUser();
 
         Debt debt = debtRepository.findById(id).orElse(null);
 
         if (debt != null) {
             debt.setStatus(status);
             debtRepository.save(debt);
+        }
+        if ("PAID".equals(status)) {
+            Notification notification = new Notification();
+            notification.setBossId(worker.getBossId());
+            notification.setMessage("Debt paid by "
+                    + debt.getCustomerName()
+                    + ". Amount: "
+                    + debt.getTotalAmount()
+                    + " RWF. Updated by worker "
+                    + worker.getUsername());
+            notification.setCreatedAt(LocalDateTime.now());
+            notification.setSeen(false);
+
+            notificationRepository.save(notification);
         }
 
         return "redirect:/worker/debt";

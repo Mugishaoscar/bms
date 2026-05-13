@@ -16,6 +16,9 @@ public class DebtService {
     private DebtRepository debtRepository;
 
     @Autowired
+    private EmailService emailService;
+
+    @Autowired
     private ProductRepository productRepository;
 
     public void createDebt(String customerName,
@@ -59,5 +62,6 @@ public class DebtService {
         debt.setStatus("UNPAID");
 
         debtRepository.save(debt);
+
     }
 }

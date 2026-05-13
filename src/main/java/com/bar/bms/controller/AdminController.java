@@ -14,6 +14,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,6 +31,9 @@ public class AdminController {
     private ProductService productService;
 
     @Autowired
+    private NotificationRepository notificationRepository;
+
+    @Autowired
     private DebtService debtService;
 
     @Autowired
@@ -35,24 +43,45 @@ public class AdminController {
     @GetMapping("/dashboard")
     public String showDashboard(Model model) {
         User boss = getLoggedInUser();
+//        User boss = getLoggedInUser();
+
+        model.addAttribute("notifications",
+                notificationRepository.findByBossIdOrderByCreatedAtDesc(boss.getId()));
+
+        model.addAttribute("unreadCount",
+                notificationRepository.countByBossIdAndSeenFalse(boss.getId()));
 
         if (boss != null) {
             model.addAttribute("products", productService.getProductsByBoss(boss.getId()));
         } else {
             model.addAttribute("products", productService.getAllProducts());
         }
+
         return "admin_dashboard";
     }
-    @Autowired
-    private NotificationRepository notificationRepository;
+
     // Handles saving products (Create and Update)
     @PostMapping("/saveProduct")
-    public String saveProduct(@ModelAttribute Product product) {
-
+    public String saveProduct(@ModelAttribute Product product,
+                              @RequestParam("imageFile") MultipartFile imageFile)
+            throws IOException {
         User boss = getLoggedInUser();
 
         if (boss != null) {
             product.setBossId(boss.getId());
+        }
+        if (!imageFile.isEmpty()) {
+            String fileName = System.currentTimeMillis() + "_" + imageFile.getOriginalFilename();
+
+            Path uploadPath = Paths.get("uploads/images");
+
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            Files.copy(imageFile.getInputStream(), uploadPath.resolve(fileName));
+
+            product.setImageUrl(fileName);
         }
 
         productService.saveProduct(product);
@@ -120,6 +149,7 @@ public class AdminController {
         workerUser.setPassword(passwordEncoder.encode(employee.getPassword()));
         workerUser.setRole("WORKER");
         workerUser.setBossId(boss.getId());
+        workerUser.setEmail(employee.getEmail());
 
         userRepository.save(workerUser);
 

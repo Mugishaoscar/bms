@@ -345,6 +345,87 @@
             border-radius: 10px;
             cursor: pointer;
         }
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .notification-wrapper {
+            position: relative;
+        }
+
+        .notification-btn {
+            width: 45px;
+            height: 45px;
+            border: none;
+            border-radius: 50%;
+            background: #e6fff0;
+            color: #007a3d;
+            font-size: 22px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .notif-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: red;
+            color: white;
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 50%;
+        }
+
+        .notif-dropdown {
+            display: none;
+            position: absolute;
+            top: 55px;
+            right: 0;
+            width: 360px;
+            max-height: 360px;
+            overflow-y: auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.18);
+            z-index: 2000;
+            padding: 12px;
+        }
+
+        .notif-dropdown.show {
+            display: block;
+        }
+
+        .notif-title {
+            font-weight: bold;
+            color: #007a3d;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
+
+        .notif-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .notif-item strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .notif-item small {
+            color: #777;
+        }
+
+        .notif-empty {
+            text-align: center;
+            color: #777;
+            padding: 15px;
+        }
     </style>
 </head>
 
@@ -377,6 +458,7 @@
         <h1>Product Dashboard</h1>
         <div class="role-pill">Admin</div>
     </div>
+
 
     <div class="container">
 
@@ -423,7 +505,7 @@
                  onclick="openModalFromCard(this)">
 
                 <div class="image-container">
-                    <img th:src="${product.imageUrl != null and product.imageUrl != ''} ? @{'/images/' + ${product.imageUrl}} : 'https://via.placeholder.com/150'"
+                    <img th:src="${product.imageUrl != null and product.imageUrl != ''} ? @{'/uploads/images/' + ${product.imageUrl}} : 'https://via.placeholder.com/150'"
                          alt="Product">
                 </div>
 
@@ -448,6 +530,34 @@
         </div>
 
     </div>
+    <div class="notification-wrapper">
+
+        <button type="button" class="notification-btn" onclick="toggleNotifications()">
+            🔔
+            <span id="notifBadge"
+                  class="notif-count"
+                  th:if="${unreadCount > 0}"
+                  th:text="${unreadCount}">
+        </span>
+        </button>
+
+        <div id="notifDropdown" class="notif-dropdown">
+
+            <div class="notif-title">Notifications</div>
+
+            <div th:each="n : ${notifications}" class="notif-item">
+                <strong th:text="${n.message}">Notification message</strong>
+                <small th:text="${n.createdAt}">Time</small>
+            </div>
+
+            <div th:if="${notifications == null or #lists.isEmpty(notifications)}"
+                 class="notif-empty">
+                No notifications yet.
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
@@ -457,7 +567,7 @@
             <h2 id="modalTitle">Add New Product</h2>
         </div>
 
-        <form th:action="@{/admin/saveProduct}" method="POST" id="productForm">
+        <form th:action="@{/admin/saveProduct}" method="POST" id="productForm" enctype="multipart/form-data">
             <input type="hidden" name="id" id="productId">
 
             <div class="form-group">
@@ -477,7 +587,8 @@
 
             <div class="form-group">
                 <label>Image Filename</label>
-                <input type="text" name="imageUrl" id="imageUrl" placeholder="example: primus.png">
+                <input type="file" name="imageFile" id="imageFile" accept="image/*">
+                <input type="hidden" name="imageUrl" id="imageUrl">
             </div>
 
             <div class="modal-footer">
@@ -527,6 +638,28 @@
             closeModal();
         }
     }
+    function toggleNotifications() {
+        const dropdown = document.getElementById("notifDropdown");
+        dropdown.classList.toggle("show");
+
+        fetch("/worker/notifications/read", {
+            method: "POST"
+        })
+            .then(response => {
+                if (response.ok) {
+                    const badge = document.getElementById("notifBadge");
+
+                    if (badge) {
+                        badge.innerText = "0";
+                        badge.style.display = "none";
+                    }
+                }
+            })
+            .catch(error => {
+                console.log("Notification read error:", error);
+            });
+    }
+
 </script>
 
 </body>

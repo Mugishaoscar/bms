@@ -19,6 +19,8 @@ public class SaleService {
 
     @Autowired
     private SaleItemRepository saleItemRepository;
+    @Autowired
+    private EmailService emailService;
 
     @Autowired
     private ProductRepository productRepository;
@@ -43,6 +45,7 @@ public class SaleService {
         Sale savedSale = saleRepository.save(sale);
 
         double total = 0.0;
+        StringBuilder itemsText = new StringBuilder();
 
         for (int i = 0; i < productIds.length; i++) {
 
@@ -70,5 +73,14 @@ public class SaleService {
 
         savedSale.setTotalAmount(total);
         saleRepository.save(savedSale);
+        if (customerEmail != null && !customerEmail.isEmpty()) {
+            emailService.sendClientBill(
+                    customerEmail,
+                    customerName == null || customerName.isEmpty() ? "Customer" : customerName,
+                    itemsText.toString(),
+                    total,
+                    "Sale"
+            );
+        }
     }
 }

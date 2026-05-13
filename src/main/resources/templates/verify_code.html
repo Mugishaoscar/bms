@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Verify Reset Code</title>
+</head>
+<body>
+
+<h2>Reset Password</h2>
+
+<form th:action="@{/verify-code}" method="post">
+
+    <input type="email" name="email" placeholder="Email" required>
+
+    <input type="text" name="code" placeholder="Reset Code" required>
+
+    <input type="password" name="newPassword" placeholder="New Password" required>
+
+    <input type="password" name="confirmPassword" placeholder="Confirm Password" required>
+
+    <button type="submit">Reset Password</button>
+
+</form>
+
+</body>
+</html>

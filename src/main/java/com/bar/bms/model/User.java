@@ -14,4 +14,7 @@ public class User {
     private String username;
     private String password;
     private String role; // This will store "BOSS"
+
+    private String email;
+    private String resetCode;
 }
