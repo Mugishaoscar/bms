@@ -280,6 +280,87 @@
             border-radius:10px;
             cursor:pointer;
         }
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .notification-wrapper {
+            position: relative;
+        }
+
+        .notification-btn {
+            width: 45px;
+            height: 45px;
+            border: none;
+            border-radius: 50%;
+            background: #e6fff0;
+            color: #007a3d;
+            font-size: 22px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .notif-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: red;
+            color: white;
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 50%;
+        }
+
+        .notif-dropdown {
+            display: none;
+            position: absolute;
+            top: 55px;
+            right: 0;
+            width: 360px;
+            max-height: 360px;
+            overflow-y: auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.18);
+            z-index: 2000;
+            padding: 12px;
+        }
+
+        .notif-dropdown.show {
+            display: block;
+        }
+
+        .notif-title {
+            font-weight: bold;
+            color: #007a3d;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
+
+        .notif-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .notif-item strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .notif-item small {
+            color: #777;
+        }
+
+        .notif-empty {
+            text-align: center;
+            color: #777;
+            padding: 15px;
+        }
     </style>
 </head>
 
@@ -308,7 +389,6 @@
 
 
 <div class="main-content">
-
     <div class="topbar">
 
         <div>
@@ -316,51 +396,45 @@
             <p>Here are your products and quick actions.</p>
         </div>
 
-        <div style="display:flex; align-items:center; gap:15px;">
+        <div class="topbar-right">
 
-            <!-- Notification -->
-            <div class="notification-box">
+            <div class="notification-wrapper">
 
-                🔔 Notifications
+                <button type="button" class="notification-btn" onclick="toggleNotifications()">
+                    🔔
+                    <span id="notifBadge"
+                          class="notif-count"
+                          th:if="${unreadCount > 0}"
+                          th:text="${unreadCount}">
+                    </span>
+                </button>
 
-                <span class="notif-count"
-                      th:text="${#lists.size(notifications)}">
-                0
-            </span>
+                <div id="notifDropdown" class="notif-dropdown">
 
-                <div class="notif-dropdown">
-
-                    <div th:each="n : ${notifications}"
-                         class="notif-item">
-
-                        <strong th:text="${n.message}">
-                            Notification
-                        </strong>
-
-                        <br>
-
-                        <small th:text="${n.createdAt}">
-                            Time
-                        </small>
-
+                    <div class="notif-title">
+                        Notifications
                     </div>
 
-                    <div th:if="${#lists.isEmpty(notifications)}"
-                         class="notif-item">
+                    <div th:each="n : ${notifications}" class="notif-item">
+                        <strong th:text="${n.message}">Notification message</strong>
+                        <small th:text="${n.createdAt}">Time</small>
+                    </div>
+
+                    <div th:if="${notifications == null or #lists.isEmpty(notifications)}"
+                         class="notif-empty">
                         No notifications yet.
                     </div>
 
                 </div>
+
             </div>
 
-            <!-- Worker Role -->
-            <div class="role-pill">
-                Worker
-            </div>
+            <div class="role-pill">Worker</div>
 
         </div>
 
     </div>
+
 
     <div class="container">
 
@@ -511,6 +585,35 @@
         newItem.querySelector("input").value = 1;
         itemsBox.appendChild(newItem);
     }
+    function toggleNotifications() {
+        const dropdown = document.getElementById("notifDropdown");
+        dropdown.classList.toggle("show");
+
+        fetch("/worker/notifications/read", {
+            method: "POST"
+        })
+            .then(response => {
+                if (response.ok) {
+                    const badge = document.getElementById("notifBadge");
+
+                    if (badge) {
+                        badge.innerText = "0";
+                        badge.style.display = "none";
+                    }
+                }
+            })
+            .catch(error => {
+                console.log("Notification read error:", error);
+            });
+    }
+
+    window.addEventListener("click", function(event) {
+        const wrapper = document.querySelector(".notification-wrapper");
+
+        if (wrapper && !wrapper.contains(event.target)) {
+            document.getElementById("notifDropdown").classList.remove("show");
+        }
+    });
 </script>
 
 </body>

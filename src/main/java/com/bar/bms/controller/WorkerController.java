@@ -2,6 +2,7 @@ package com.bar.bms.controller;
 
 import com.bar.bms.model.DayReport;
 import com.bar.bms.model.Debt;
+import com.bar.bms.model.Notification;
 import com.bar.bms.model.User;
 import com.bar.bms.repository.*;
 import com.bar.bms.service.DebtService;
@@ -16,10 +17,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Controller
 @RequestMapping("/worker")
@@ -40,8 +43,17 @@ public class WorkerController {
         } else {
             model.addAttribute("products", productService.getAllProducts());
         }
-        model.addAttribute("notifications",
-                notificationRepository.findByBossIdOrderByCreatedAtDesc(worker.getBossId()));
+        model.addAttribute(
+                "notifications",
+                notificationRepository
+                        .findByBossIdOrderByCreatedAtDesc(
+                                worker.getBossId()));
+
+        model.addAttribute(
+                "unreadCount",
+                notificationRepository
+                        .countByBossIdAndSeenFalse(
+                                worker.getBossId()));
         return "worker_dashboard";
     }
 
@@ -201,6 +213,25 @@ public class WorkerController {
         String username = auth.getName();
 
         return userRepository.findByUsername(username).orElse(null);
+    }
+    @PostMapping("/notifications/read")
+    @ResponseBody
+    public String markNotificationsRead() {
+
+        User worker = getLoggedInUser();
+
+        List<Notification> notifications =
+                notificationRepository
+                        .findByBossIdOrderByCreatedAtDesc(
+                                worker.getBossId());
+
+        for (Notification n : notifications) {
+            n.setSeen(true);
+        }
+
+        notificationRepository.saveAll(notifications);
+
+        return "success";
     }
 
 
