@@ -456,7 +456,35 @@
 
     <div class="topbar">
         <h1>Product Dashboard</h1>
-        <div class="role-pill">Admin</div>
+
+        <div class="topbar-right">
+            <div class="notification-wrapper">
+                <button type="button" class="notification-btn" onclick="toggleNotifications()">
+                    🔔
+                    <span id="notifBadge"
+                          class="notif-count"
+                          th:if="${unreadCount > 0}"
+                          th:text="${unreadCount}">
+                </span>
+                </button>
+
+                <div id="notifDropdown" class="notif-dropdown">
+                    <div class="notif-title">Notifications</div>
+
+                    <div th:each="n : ${notifications}" class="notif-item">
+                        <strong th:text="${n.message}">Notification message</strong>
+                        <small th:text="${n.createdAt}">Time</small>
+                    </div>
+
+                    <div th:if="${notifications == null or #lists.isEmpty(notifications)}"
+                         class="notif-empty">
+                        No notifications yet.
+                    </div>
+                </div>
+            </div>
+
+            <div class="role-pill">Admin</div>
+        </div>
     </div>
 
 
@@ -530,34 +558,7 @@
         </div>
 
     </div>
-    <div class="notification-wrapper">
 
-        <button type="button" class="notification-btn" onclick="toggleNotifications()">
-            🔔
-            <span id="notifBadge"
-                  class="notif-count"
-                  th:if="${unreadCount > 0}"
-                  th:text="${unreadCount}">
-        </span>
-        </button>
-
-        <div id="notifDropdown" class="notif-dropdown">
-
-            <div class="notif-title">Notifications</div>
-
-            <div th:each="n : ${notifications}" class="notif-item">
-                <strong th:text="${n.message}">Notification message</strong>
-                <small th:text="${n.createdAt}">Time</small>
-            </div>
-
-            <div th:if="${notifications == null or #lists.isEmpty(notifications)}"
-                 class="notif-empty">
-                No notifications yet.
-            </div>
-
-        </div>
-
-    </div>
 
 </div>
 
@@ -642,7 +643,7 @@
         const dropdown = document.getElementById("notifDropdown");
         dropdown.classList.toggle("show");
 
-        fetch("/worker/notifications/read", {
+        fetch("/admin/notifications/read", {
             method: "POST"
         })
             .then(response => {

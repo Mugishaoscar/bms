@@ -14,6 +14,7 @@ public class Notification {
     private String message;
     private LocalDateTime createdAt;
     private boolean seen = false;
+    private String targetRole;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -29,4 +30,11 @@ public class Notification {
 
     public boolean isSeen() { return seen; }
     public void setSeen(boolean seen) { this.seen = seen; }
+    public String getTargetRole() {
+        return targetRole;
+    }
+
+    public void setTargetRole(String targetRole) {
+        this.targetRole = targetRole;
+    }
 }

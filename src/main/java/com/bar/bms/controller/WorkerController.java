@@ -39,22 +39,17 @@ public class WorkerController {
     public String workerDashboard(Model model) {
         User worker = getLoggedInUser();
 
-        if (worker != null) {
-            model.addAttribute("products", productService.getProductsByBoss(worker.getBossId()));
-        } else {
-            model.addAttribute("products", productService.getAllProducts());
-        }
-        model.addAttribute(
-                "notifications",
-                notificationRepository
-                        .findByBossIdOrderByCreatedAtDesc(
-                                worker.getBossId()));
+        model.addAttribute("products",
+                productService.getProductsByBoss(worker.getBossId()));
 
-        model.addAttribute(
-                "unreadCount",
-                notificationRepository
-                        .countByBossIdAndSeenFalse(
-                                worker.getBossId()));
+        model.addAttribute("notifications",
+                notificationRepository.findByBossIdAndTargetRoleOrderByCreatedAtDesc(
+                        worker.getBossId(), "WORKER"));
+
+        model.addAttribute("unreadCount",
+                notificationRepository.countByBossIdAndTargetRoleAndSeenFalse(
+                        worker.getBossId(), "WORKER"));
+
         return "worker_dashboard";
     }
 
@@ -156,6 +151,7 @@ public class WorkerController {
         dayReportRepository.save(report);
         Notification notification = new Notification();
         notification.setBossId(worker.getBossId());
+        notification.setTargetRole("BOSS");
         notification.setMessage("Worker " + worker.getUsername()
                 + " ended the day. Total earned: "
                 + totalSales + " RWF");
@@ -227,6 +223,21 @@ public class WorkerController {
             notification.setSeen(false);
 
             notificationRepository.save(notification);
+            if ("PAID".equals(status) && debt != null) {
+
+                notification.setBossId(worker.getBossId());
+                notification.setTargetRole("BOSS");
+                notification.setMessage("Debt paid by "
+                        + debt.getCustomerName()
+                        + ". Amount: "
+                        + debt.getTotalAmount()
+                        + " RWF. Updated by worker "
+                        + worker.getUsername());
+                notification.setCreatedAt(LocalDateTime.now());
+                notification.setSeen(false);
+
+                notificationRepository.save(notification);
+            }
         }
 
         return "redirect:/worker/debt";
@@ -247,8 +258,9 @@ public class WorkerController {
 
         List<Notification> notifications =
                 notificationRepository
-                        .findByBossIdOrderByCreatedAtDesc(
-                                worker.getBossId());
+                        .findByBossIdAndTargetRoleOrderByCreatedAtDesc(
+                                worker.getBossId(),
+                                "WORKER");
 
         for (Notification n : notifications) {
             n.setSeen(true);

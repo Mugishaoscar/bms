@@ -41,21 +41,19 @@ public class AdminController {
 
     // Handles the URL: http://localhost:8080/admin/dashboard
     @GetMapping("/dashboard")
-    public String showDashboard(Model model) {
+    public String adminDashboard(Model model) {
         User boss = getLoggedInUser();
-//        User boss = getLoggedInUser();
+
+        model.addAttribute("products",
+                productService.getProductsByBoss(boss.getId()));
 
         model.addAttribute("notifications",
-                notificationRepository.findByBossIdOrderByCreatedAtDesc(boss.getId()));
+                notificationRepository.findByBossIdAndTargetRoleOrderByCreatedAtDesc(
+                        boss.getId(), "BOSS"));
 
         model.addAttribute("unreadCount",
-                notificationRepository.countByBossIdAndSeenFalse(boss.getId()));
-
-        if (boss != null) {
-            model.addAttribute("products", productService.getProductsByBoss(boss.getId()));
-        } else {
-            model.addAttribute("products", productService.getAllProducts());
-        }
+                notificationRepository.countByBossIdAndTargetRoleAndSeenFalse(
+                        boss.getId(), "BOSS"));
 
         return "admin_dashboard";
     }
@@ -88,11 +86,23 @@ public class AdminController {
 
         if (boss != null) {
             Notification notification = new Notification();
+
             notification.setBossId(boss.getId());
-            notification.setMessage("Boss updated stock/product: " + product.getName()
-                    + " | Quantity: " + product.getStockQuantity()
-                    + " | Price: " + product.getPrice() + " RWF");
+
+            notification.setTargetRole("WORKER");
+
+            notification.setMessage(
+                    "Boss updated stock/product: "
+                            + product.getName()
+                            + " | Quantity: "
+                            + product.getStockQuantity()
+                            + " | Price: "
+                            + product.getPrice()
+                            + " RWF"
+            );
+
             notification.setCreatedAt(LocalDateTime.now());
+            notification.setSeen(false);
 
             notificationRepository.save(notification);
         }
